@@ -1,0 +1,14 @@
+#!/bin/bash
+
+mkdir bl
+
+g++ -c num/library.cpp -o bl/num.o
+ar rc bl/num.a bl/num.o
+
+g++ -c -INumber vec/vec.cpp -o bl/vec.o
+g++ bl/num.a bl/vec.o -shared -o bl/vec.so
+
+g++ -o main Test/main.cpp -IVector -INumber bl/vec.so bl/num.a;
+./main
+
+rm -R bl
