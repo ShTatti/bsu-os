@@ -7,12 +7,12 @@
 std::chrono::time_point<std::chrono::steady_clock> start, end;
 std::chrono::duration<float> duration{};
 
-struct ThreadParams {
+struct threadParams {
     const std::vector<std::vector<int>> &A;
     const std::vector<std::vector<int>> &B;
     std::vector<std::vector<int>> &D;
     int start1,start2, m_size,count;
-    ThreadParams(const std::vector<std::vector<int>> &a, const std::vector<std::vector<int>> &b, std::vector<std::vector<int>> &res, int i, int j, int size, int count) : 
+    threadParams(const std::vector<std::vector<int>> &a, const std::vector<std::vector<int>> &b, std::vector<std::vector<int>> &res, int i, int j, int size, int count) :
     A(a), B(b), D(res), start1(i), start2(j), m_size(size), count(count){}
 };
 
@@ -44,9 +44,9 @@ void multiplyBlocks(const std::vector<std::vector<int>> &a, const std::vector<st
     }
 }
 
-DWORD WINAPI CallMultiply(LPVOID args)
+DWORD WINAPI callMultiply(LPVOID args)
 {
-    ThreadParams *castedArgs = (ThreadParams *)args;
+    threadParams *castedArgs = (threadParams *)args;
     multiplyBlocks(castedArgs->A, castedArgs->B, castedArgs->D, castedArgs->start1, castedArgs->start2, castedArgs->m_size, castedArgs->count);
     ExitThread(0);
 }
@@ -56,7 +56,7 @@ void multiplyMatrices(const std::vector<std::vector<int>> &a, const std::vector<
     for (int blockI = 0; blockI < size; blockI += count) {
         for (int blockJ = 0; blockJ < size; blockJ += count) {
             threads.emplace_back(
-                    CreateThread(NULL, 0, &CallMultiply, new ThreadParams(a, b, res, blockI, blockJ, size, count), 0,NULL));
+                    CreateThread(NULL, 0, &callMultiply, new threadParams(a, b, res, blockI, blockJ, size, count), 0,NULL));
         }
     }
     for (HANDLE &thread : threads)
